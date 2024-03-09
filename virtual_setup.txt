@@ -1,0 +1,8 @@
+virtualenv flower_env
+.\flower_env\Scripts\Activate.ps1 **idk use Mac version of this
+Install these 3 things:
+pip install flask
+
+pip install openai
+
+pip install python-dotenv
