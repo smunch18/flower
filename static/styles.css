@@ -26,6 +26,11 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.chat-container img {
+    max-width: 100%; /* Ensures image width does not exceed container width */
+    max-height: 100%; /* Ensures image height does not exceed container height */
+}
+
 .chat-box {
     height: 200px;
     overflow-y: scroll;
