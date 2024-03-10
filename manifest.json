@@ -1,0 +1,11 @@
+{
+    "name": "Flower Extension",
+    "version": "1.0.0",
+    "description": "support local. support nature.",
+    "manifest_version": 3,
+    "author": "flowerteam",
+    "action":{
+        "default_popup": "templates/index.html",
+        "default_title": "Flower Extension"
+    }
+}

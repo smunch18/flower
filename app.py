@@ -1,5 +1,8 @@
 from flask import Flask, render_template, request
 from openai import OpenAI 
+import googlemaps
+import pandas as pd
+import time
 
 app = Flask(__name__)
 
@@ -13,33 +16,6 @@ client = OpenAI(
     # This is the default and can be omitted
     api_key=api_key
 )
-
-"""@app.route('/', methods=['GET', 'POST'])
-
-def capitalize_text():
-    if request.method == 'POST':
-        global user_input
-        user_input = request.form['user_input']
-
-        completion = client.chat.completions.create(
-            model="gpt-4-0125-preview",
-            messages=[
-                {"role": "system", "content": "Extract the item the user is searching for and the users' location."},
-                {"role": "user", "content": user_input}
-            ],
-            temperature= 0.2,
-        )
-
-        capitalized_text = completion.choices[0].message.content
-
-        #capitalized_text = user_input.upper()
-        return render_template('index2.html', capitalized_text=capitalized_text)
-    return render_template('index2.html')
-
-
-
-if __name__ == '__main__':
-    app.run(debug=True)"""
 
 @app.route('/')
 def index():
@@ -79,7 +55,47 @@ def respond(user_message):
     user_location = response[1].strip()
     chat_response = response[2].strip()
 
+    places = get_places(search_item, user_location)
+
+    #somehow incorporate places into chat response output?
+
     return chat_response
+
+def get_places(search_item, user_location):
+    api_key = ''
+    with open("googlemaps_key.txt","r") as w:
+        api_key = w.readline()
+
+    map_client = googlemaps.Client(api_key)
+
+    #loc = tuple(input("Please write the latitude, longitude of where you're located: "))
+    location = (44.23268671539581, -76.48910279456975) #random loc in kingston: 44.23268671539581, -76.48910279456975
+    if " " in search_item:
+        search_item = search_item.replace(" ", "")
+    search_string = search_item  #str(input("What are you searching for? "))
+    distance = 1500 #15km
+
+    business_list = []
+
+    response = map_client.places_nearby(location=location, keyword=search_string, radius=distance)
+
+#print(response.get('results'))
+
+    business_list.extend(response.get('results'))
+    next_page_token = response.get('next_page_token')
+
+    while next_page_token:
+        time.sleep(2)
+        response = map_client.places_nearby(location=location, keyword=search_string, radius=distance, page_token=next_page_token)
+        business_list.extend(response.get('results'))
+        next_page_token = response.get('next_page_token')
+
+    df = pd.DataFrame(business_list)
+    #print(df['place_id'])
+    #print(df.columns)
+    place_id = df['place_id']
+    df['url'] = 'www.google.com/maps/place/?q=place_id:' + place_id
+    return df['names']
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,17 +1,11 @@
 import googlemaps
 import pandas as pd
 import time
-
-def miles_to_meters(miles):
-    try:
-        return miles * 1_609.344
-    except:
-        return 0
     
-#API_KEY = open('API_KEY.txt', 'r') #need to create this txt first
-#print(API_KEY)
-#print(type(API_KEY))
-map_client = googlemaps.Client("AIzaSyCFbuGeFfPjNJIHeSOpQeVo5X7fwsZDLR4")
+api_key = ''
+with open("googlemaps_key.txt","r") as w:
+    api_key = w.readline()
+map_client = googlemaps.Client(api_key)
 
 #loc = tuple(input("Please write the latitude, longitude of where you're located: "))
 location = (44.23268671539581, -76.48910279456975) #random loc in kingston: 44.23268671539581, -76.48910279456975
